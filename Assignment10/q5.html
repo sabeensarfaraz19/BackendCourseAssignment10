@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Ticket Status Checker</title>
+</head>
+
+<body>
+    <h1>Support Ticket Status Checker</h1>
+
+    <label for="ticketId">Enter Ticket ID:</label>
+    <input type="text" id="ticketId" placeholder="e.g. T101">
+
+    <button id="checkBtn">Check Status</button>
+
+    <p id="message"></p>
+    <div id="ticketDetails"></div>
+    <script>
+
+        let tickets = [
+            {
+                id: "T101",
+                customerName: "Ali",
+                status: "Open"
+            },
+            {
+                id: "T102",
+                customerName: "Sara",
+                status: "In Progress"
+            },
+            {
+                id: "T103",
+                customerName: "Ahmed",
+                status: "Resolved"
+            }
+        ];
+
+        let ticketIdInput = document.querySelector("#ticketId");
+        let checkBtn = document.querySelector("#checkBtn");
+        let message = document.querySelector("#message");
+        let ticketDetails = document.querySelector("#ticketDetails");
+
+        function getTicket(ticketId) {
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    let ticket = tickets.find(function (item) {
+                        return item.id === ticketId;
+                    });
+
+                    if (ticket) {
+                        resolve(ticket);
+                    } else {
+                        reject("Ticket not found. Please check the ticket ID and try again.");
+                    }
+                }, 2000);
+            });
+        }
+
+        async function checkTicket() {
+            let ticketId = ticketIdInput.value.trim().toUpperCase();
+
+            ticketDetails.innerHTML = "";
+
+            if (ticketId === "") {
+                message.textContent = "Please enter a ticket ID.";
+                return;
+            }
+
+            message.textContent = "Loading ticket details...";
+
+            checkBtn.disabled = true;
+
+            try {
+                let ticket = await getTicket(ticketId);
+
+                message.textContent = "Ticket retrieved successfully!";
+
+                ticketDetails.innerHTML = `
+            <h2>Ticket Details</h2>
+            <p><strong>Ticket ID:</strong> ${ticket.id}</p>
+            <p><strong>Customer:</strong> ${ticket.customerName}</p>
+            <p><strong>Status:</strong> ${ticket.status}</p>
+        `;
+            } catch (error) {
+                message.textContent = error;
+            } finally {
+                checkBtn.disabled = false;
+            }
+        }
+
+        checkBtn.addEventListener("click", checkTicket);
+
+    </script>
+</body>
+
+</html>
